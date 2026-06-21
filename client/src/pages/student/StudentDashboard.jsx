@@ -9,7 +9,7 @@ import { MOOD_OPTIONS } from '../../utils/constants';
 
 export default function StudentDashboard() {
   const { user } = useAuth();
-  
+
   // Fetch Attendance to calculate streak and check if marked today
   const { data: attendanceData, refetch: refetchAttendance } = useFetch(getMyAttendance);
   const { data: standupData, refetch: refetchStandups } = useFetch(getMyStandups);
@@ -31,9 +31,9 @@ export default function StudentDashboard() {
 
   // Derived states
   const records = attendanceData?.records || [];
-  const streak = calculateStreak(records);
   const today = new Date().setUTCHours(0, 0, 0, 0);
-  
+  const streak = calculateStreak(records);
+
   const hasMarkedAttendanceToday = records.some(r => {
     const rDate = new Date(r.date).setUTCHours(0, 0, 0, 0);
     return rDate === today;
@@ -49,13 +49,13 @@ export default function StudentDashboard() {
     if (!records.length) return 0;
     let currentStreak = 0;
     const sorted = [...records].sort((a, b) => new Date(b.date) - new Date(a.date));
-    
+
     // Check if latest is today or yesterday to continue streak
-    const latestDate = new Date(sorted[0].date).setUTCHours(0,0,0,0);
+    const latestDate = new Date(sorted[0].date).setUTCHours(0, 0, 0, 0);
     const yesterday = new Date(today);
     yesterday.setDate(yesterday.getDate() - 1);
-    
-    if (latestDate !== today && latestDate !== yesterday.setUTCHours(0,0,0,0)) return 0;
+
+    if (latestDate !== today && latestDate !== yesterday.setUTCHours(0, 0, 0, 0)) return 0;
 
     for (let i = 0; i < sorted.length; i++) {
       if (sorted[i].status === 'present') {
@@ -121,7 +121,7 @@ export default function StudentDashboard() {
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Welcome, {user?.name}!</h1>
           <p className="text-gray-500 font-medium">Ready to crush your goals today?</p>
         </div>
-        
+
         <div className="relative z-10 flex items-center gap-4 bg-gradient-to-br from-orange-50 to-rose-50 px-6 py-4 rounded-2xl border border-orange-100 shadow-inner">
           <div className="p-3 bg-gradient-to-br from-orange-400 to-rose-500 rounded-xl text-white shadow-md shadow-orange-200">
             <Flame size={28} className={streak > 0 ? 'animate-pulse' : ''} />
@@ -137,10 +137,10 @@ export default function StudentDashboard() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        
+
         {/* Left Column: Attendance & Demo */}
         <div className="space-y-6">
-          
+
           {/* Attendance Card */}
           <div className="bg-white rounded-3xl p-6 border border-gray-100 shadow-sm relative overflow-hidden group">
             <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-50 rounded-full filter blur-2xl opacity-50 -translate-y-1/2 translate-x-1/2 group-hover:scale-110 transition-transform"></div>
@@ -151,9 +151,9 @@ export default function StudentDashboard() {
                 </div>
                 <h2 className="text-xl font-bold text-gray-900">Today's Attendance</h2>
               </div>
-              
-              {attendanceError && <div className="mb-4 text-sm text-red-600 bg-red-50 p-3 rounded-xl font-medium flex items-center gap-2"><AlertCircle size={16}/>{attendanceError}</div>}
-              
+
+              {attendanceError && <div className="mb-4 text-sm text-red-600 bg-red-50 p-3 rounded-xl font-medium flex items-center gap-2"><AlertCircle size={16} />{attendanceError}</div>}
+
               {hasMarkedAttendanceToday || attendanceSuccess ? (
                 <div className="bg-emerald-50 border border-emerald-100 rounded-2xl p-6 text-center">
                   <div className="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-3 shadow-sm">
@@ -184,26 +184,26 @@ export default function StudentDashboard() {
                 <h2 className="text-xl font-bold text-gray-900">Submit Project Demo</h2>
               </div>
 
-              {demoSuccess && <div className="mb-4 text-sm text-emerald-600 bg-emerald-50 p-3 rounded-xl font-medium flex items-center gap-2"><CheckCircle2 size={16}/>Demo submitted successfully!</div>}
-              {demoError && <div className="mb-4 text-sm text-red-600 bg-red-50 p-3 rounded-xl font-medium flex items-center gap-2"><AlertCircle size={16}/>{demoError}</div>}
+              {demoSuccess && <div className="mb-4 text-sm text-emerald-600 bg-emerald-50 p-3 rounded-xl font-medium flex items-center gap-2"><CheckCircle2 size={16} />Demo submitted successfully!</div>}
+              {demoError && <div className="mb-4 text-sm text-red-600 bg-red-50 p-3 rounded-xl font-medium flex items-center gap-2"><AlertCircle size={16} />{demoError}</div>}
 
               <form onSubmit={handleDemoSubmit} className="space-y-4">
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-1.5">Project Title</label>
-                  <input required value={demoForm.title} onChange={e => setDemoForm({...demoForm, title: e.target.value})} className="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all" placeholder="e.g. E-Commerce Backend" />
+                  <input required value={demoForm.title} onChange={e => setDemoForm({ ...demoForm, title: e.target.value })} className="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all" placeholder="e.g. E-Commerce Backend" />
                 </div>
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-1.5">Description</label>
-                  <textarea required value={demoForm.description} onChange={e => setDemoForm({...demoForm, description: e.target.value})} rows="2" className="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all resize-none" placeholder="Briefly describe your project..."></textarea>
+                  <textarea required value={demoForm.description} onChange={e => setDemoForm({ ...demoForm, description: e.target.value })} rows="2" className="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all resize-none" placeholder="Briefly describe your project..."></textarea>
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-semibold text-gray-700 mb-1.5">Repo URL</label>
-                    <input type="url" value={demoForm.repoUrl} onChange={e => setDemoForm({...demoForm, repoUrl: e.target.value})} className="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all" placeholder="https://github.com/..." />
+                    <input type="url" value={demoForm.repoUrl} onChange={e => setDemoForm({ ...demoForm, repoUrl: e.target.value })} className="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all" placeholder="https://github.com/..." />
                   </div>
                   <div>
                     <label className="block text-sm font-semibold text-gray-700 mb-1.5">Live URL</label>
-                    <input type="url" value={demoForm.deployedUrl} onChange={e => setDemoForm({...demoForm, deployedUrl: e.target.value})} className="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all" placeholder="https://..." />
+                    <input type="url" value={demoForm.deployedUrl} onChange={e => setDemoForm({ ...demoForm, deployedUrl: e.target.value })} className="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all" placeholder="https://..." />
                   </div>
                 </div>
                 <button disabled={demoLoading} className="w-full py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-xl font-bold shadow-md shadow-blue-200 transition-all disabled:opacity-70 flex justify-center mt-2">
@@ -223,7 +223,7 @@ export default function StudentDashboard() {
             <h2 className="text-xl font-bold text-gray-900">Daily Stand-up</h2>
           </div>
 
-          {standupError && <div className="mb-4 text-sm text-red-600 bg-red-50 p-3 rounded-xl font-medium flex items-center gap-2"><AlertCircle size={16}/>{standupError}</div>}
+          {standupError && <div className="mb-4 text-sm text-red-600 bg-red-50 p-3 rounded-xl font-medium flex items-center gap-2"><AlertCircle size={16} />{standupError}</div>}
 
           {hasSubmittedStandupToday || standupSuccess ? (
             <div className="flex-1 flex flex-col items-center justify-center text-center p-8 bg-purple-50/50 rounded-2xl border border-purple-100/50">
@@ -237,17 +237,17 @@ export default function StudentDashboard() {
             <form onSubmit={handleStandupSubmit} className="flex-1 flex flex-col space-y-5">
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-1.5">What did you do yesterday?</label>
-                <textarea required value={standupForm.yesterday} onChange={e => setStandupForm({...standupForm, yesterday: e.target.value})} rows="2" className="w-full p-3.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all resize-none" placeholder="Completed API routes..."></textarea>
+                <textarea required value={standupForm.yesterday} onChange={e => setStandupForm({ ...standupForm, yesterday: e.target.value })} rows="2" className="w-full p-3.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all resize-none" placeholder="Completed API routes..."></textarea>
               </div>
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-1.5">What will you do today?</label>
-                <textarea required value={standupForm.today} onChange={e => setStandupForm({...standupForm, today: e.target.value})} rows="2" className="w-full p-3.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all resize-none" placeholder="Working on the frontend UI..."></textarea>
+                <textarea required value={standupForm.today} onChange={e => setStandupForm({ ...standupForm, today: e.target.value })} rows="2" className="w-full p-3.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all resize-none" placeholder="Working on the frontend UI..."></textarea>
               </div>
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-1.5">Any blockers?</label>
-                <textarea value={standupForm.blockers} onChange={e => setStandupForm({...standupForm, blockers: e.target.value})} rows="2" className="w-full p-3.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all resize-none" placeholder="None" defaultValue="None"></textarea>
+                <textarea value={standupForm.blockers} onChange={e => setStandupForm({ ...standupForm, blockers: e.target.value })} rows="2" className="w-full p-3.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all resize-none" placeholder="None"></textarea>
               </div>
-              
+
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2">How are you feeling today?</label>
                 <div className="grid grid-cols-4 gap-2">
@@ -255,7 +255,7 @@ export default function StudentDashboard() {
                     <button
                       key={mood.value}
                       type="button"
-                      onClick={() => setStandupForm({...standupForm, mood: mood.value})}
+                      onClick={() => setStandupForm({ ...standupForm, mood: mood.value })}
                       className={`p-2 rounded-xl text-sm font-medium transition-all border ${standupForm.mood === mood.value ? 'bg-purple-50 border-purple-200 text-purple-700 shadow-sm ring-1 ring-purple-500' : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'}`}
                     >
                       {mood.label}
