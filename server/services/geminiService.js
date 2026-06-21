@@ -1,28 +1,37 @@
-const { GoogleGenerativeAI } = require('@google/generative-ai');
-
 const apiKey = process.env.GEMINI_API_KEY;
-const genAI = apiKey ? new GoogleGenerativeAI(apiKey) : null;
 
 async function analyze(prompt) {
-  if (!genAI) {
-    console.warn("⚠️ GEMINI_API_KEY is missing. Using Mock...");
+  if (!apiKey) {
+    console.warn("⚠️ GEMINI_API_KEY missing. Using Mock...");
     return getMockResponse();
   }
 
   try {
-    // Switch to the universally supported gemini-pro model
-    const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+    console.log("🧠 Sending live data via direct Fetch API...");
 
-    console.log("🧠 Sending live data snapshot to Gemini API...");
-    const result = await model.generateContent(prompt);
-    const responseText = result.response.text();
+    // Bypassing the outdated SDK and hitting the Google REST API directly
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: prompt }] }],
+        generationConfig: { responseMimeType: "application/json" }
+      })
+    });
 
-    // Bulletproof JSON parser (strips out any markdown formatting Gemini might add)
+    if (!response.ok) {
+      throw new Error(`Google API Rejected Request: ${response.status} ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    const responseText = data.candidates[0].content.parts[0].text;
+
+    // Clean and parse the response
     const cleanText = responseText.replace(/```json/gi, '').replace(/```/gi, '').trim();
     return JSON.parse(cleanText);
 
   } catch (error) {
-    console.error("❌ Gemini API Error:", error);
+    console.error("❌ Direct Fetch Error:", error.message);
     return getMockResponse();
   }
 }
