@@ -1,39 +1,32 @@
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 
-// Initialize the Gemini API client using Render's environment variables
 const apiKey = process.env.GEMINI_API_KEY;
 const genAI = apiKey ? new GoogleGenerativeAI(apiKey) : null;
 
 async function analyze(prompt) {
-  // Safe fallback if you forgot to add the key to Render
   if (!genAI) {
-    console.warn("⚠️ GEMINI_API_KEY is missing in environment variables. Using Emergency Mock AI Response...");
+    console.warn("⚠️ GEMINI_API_KEY is missing. Using Mock...");
     return getMockResponse();
   }
 
   try {
-    // Using gemini-1.5-flash for lightning-fast analysis
-    const model = genAI.getGenerativeModel({
-      model: "gemini-1.5-flash",
-      // Force the model to output structured JSON so JSON.parse() doesn't fail
-      generationConfig: { responseMimeType: "application/json" }
-    });
+    // Switch to the universally supported gemini-pro model
+    const model = genAI.getGenerativeModel({ model: "gemini-pro" });
 
     console.log("🧠 Sending live data snapshot to Gemini API...");
     const result = await model.generateContent(prompt);
     const responseText = result.response.text();
 
-    // Parse the string from Gemini into a real JavaScript object
-    return JSON.parse(responseText);
+    // Bulletproof JSON parser (strips out any markdown formatting Gemini might add)
+    const cleanText = responseText.replace(/```json/gi, '').replace(/```/gi, '').trim();
+    return JSON.parse(cleanText);
 
   } catch (error) {
     console.error("❌ Gemini API Error:", error);
-    console.warn("⚠️ Falling back to Emergency Mock AI Response to keep demo alive...");
     return getMockResponse();
   }
 }
 
-// Your original mock data kept safely as a fallback system
 function getMockResponse() {
   return {
     engagementScore: 78,
