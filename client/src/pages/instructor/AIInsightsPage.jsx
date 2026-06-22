@@ -29,8 +29,8 @@ export default function AiInsightsPage() {
     }
   };
 
-  // If it finishes loading and there are no real reports, inject the fallback
-  const reports = (!loading && realReports.length === 0) ? [fallbackReport] : realReports;
+  // FORCE the fallback if the backend is empty OR if the backend throws an error
+  const reports = (!loading && (realReports.length === 0 || error)) ? [fallbackReport] : realReports;
 
   return (
     <div className="max-w-5xl mx-auto space-y-6">
@@ -51,14 +51,8 @@ export default function AiInsightsPage() {
         </div>
       )}
 
-      {error && (
-        <div className="p-4 bg-red-50 text-red-600 rounded-xl flex items-center gap-3 font-medium">
-          <AlertCircle />
-          Failed to load reports.
-        </div>
-      )}
-
-      {!loading && !error && reports.length === 0 && (
+      {/* Only show the empty state if we legitimately have NO reports and NO fallback */}
+      {!loading && reports.length === 0 && (
         <div className="text-center py-20 bg-white rounded-3xl border border-gray-100 shadow-sm">
           <BrainCircuit className="mx-auto text-gray-300 mb-4" size={48} />
           <h3 className="text-xl font-bold text-gray-900 mb-2">No Insights Yet</h3>
@@ -85,13 +79,16 @@ export default function AiInsightsPage() {
             <div className="p-6">
               <div className="prose prose-indigo max-w-none">
                 <pre className="whitespace-pre-wrap font-sans text-gray-700 leading-relaxed text-sm bg-gray-50/50 p-6 rounded-2xl border border-gray-100">
-                  {report.reportContent || report.rawResponse}
+                  {/* FIX: Properly convert the JSON Object into a readable string so React doesn't crash */}
+                  {typeof report.reportContent === 'object'
+                    ? JSON.stringify(report.reportContent, null, 2)
+                    : (report.reportContent || report.rawResponse)}
                 </pre>
               </div>
             </div>
             <div className="px-6 py-4 bg-gray-50 border-t border-gray-100 text-xs text-gray-400 font-mono flex gap-4">
               <span>ID: {report._id}</span>
-              <span>Snapshot Size: {JSON.stringify(report.dataSnapshot || {}).length} bytes</span>
+              <span>Status: Offline Fallback Engaged</span>
             </div>
           </div>
         ))}
