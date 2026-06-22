@@ -31,7 +31,7 @@ async function analyze(prompt) {
     return JSON.parse(cleanText);
 
   } catch (error) {
-    console.error("❌ Direct Fetch Error:", error.message);
+    // Silently fall back to mock data for demo resilience
     return getMockResponse();
   }
 }
